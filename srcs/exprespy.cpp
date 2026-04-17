@@ -31,6 +31,7 @@
     #define PYBYTES_asChar  PyString_AsString
     #define PYBYTES_check   PyString_Check
     #define PYBYTES_SIZE    PyString_GET_SIZE
+    #define PYUNICODE_SIZE  PyUnicode_GET_SIZE
 #else
     // py3 では io.StringIO を使用し unicode のみに対応する。
     #define STRINGIO_MODULE         "io"
@@ -40,6 +41,7 @@
     #define PYBYTES_asChar  PyBytes_AsString
     #define PYBYTES_check   PyBytes_Check
     #define PYBYTES_SIZE    PyBytes_GET_SIZE
+    #define PYUNICODE_SIZE  PyUnicode_GetLength
 #endif
 
 
@@ -780,7 +782,7 @@ MStatus Exprespy::_executeCode(MDataBlock& block)
 #if PY_MAJOR_VERSION < 3
                 if ((PyUnicode_Check(str) && PyUnicode_GET_SIZE(str)) || PYBYTES_SIZE(str))
 #else
-                if (PyUnicode_GET_SIZE(str))
+                if (PYUNICODE_SIZE(str))
 #endif
                     PyObject_CallMethod(_sys_stdout, "write", "(O)", str);
                 Py_DECREF(str);
@@ -836,7 +838,7 @@ MStatus Exprespy::_executeCode(MDataBlock& block)
                     // wchar_t のまま MString 化するが 3.2 未満だと API が古いので切り分ける。
 #if PY_MAJOR_VERSION < 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 2)
                     wchar_t* ws = 0;
-                    Py_ssize_t siz = PyUnicode_GET_SIZE(valo);
+                    Py_ssize_t siz = PYUNICODE_SIZE(valo);
                     if (siz) {
                         ++siz;
                         ws = reinterpret_cast<wchar_t*>(PyMem_Malloc(siz * sizeof(wchar_t)));
@@ -1322,7 +1324,7 @@ void Exprespy::_preparePyPlug1()
 //=============================================================================
 MStatus initializePlugin(MObject obj)
 { 
-    static const char* VERSION = "3.0.1.20220627";
+    static const char* VERSION = "3.0.1.20260417";
     static const char* VENDER  = "Ryusuke Sasaki";
 
     MFnPlugin plugin(obj, VENDER, VERSION, "Any");
