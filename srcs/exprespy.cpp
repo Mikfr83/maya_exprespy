@@ -780,7 +780,7 @@ MStatus Exprespy::_executeCode(MDataBlock& block)
             PyObject* str = PyObject_CallMethod(stream, "getvalue", NULL);
             if (str) {
 #if PY_MAJOR_VERSION < 3
-                if ((PyUnicode_Check(str) && PyUnicode_GET_SIZE(str)) || PYBYTES_SIZE(str))
+                if ((PyUnicode_Check(str) && PYUNICODE_SIZE(str)) || PYBYTES_SIZE(str))
 #else
                 if (PYUNICODE_SIZE(str))
 #endif
